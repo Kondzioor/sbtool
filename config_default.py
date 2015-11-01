@@ -3,12 +3,12 @@ It's default configuration file.
 """
 
 STUFF_TO_BOOKING = {
-    'type_1_stuff_1',
-    'type_1_stuff_2',
-    'type_1_stuff_3',
-    'type_2_stuff_1',
-    'type_2_stuff_2',
-    'type_3_stuff_3'
+    'type_1': ['type_1_stuff_1',
+               'type_1_stuff_2',
+               'type_1_stuff_3'],
+    'type_2': ['type_2_stuff_1',
+               'type_2_stuff_2',
+               'type_3_stuff_3']
 }
 
 SERVER = {

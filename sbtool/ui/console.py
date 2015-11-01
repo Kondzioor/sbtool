@@ -20,6 +20,8 @@ class Application(object):
         """ Dispatches user chose"""
         if options.list:
             self.display_list()
+        elif options.reserve_stuff:
+            self.reserve_stuff(options.reserve_stuff)
         elif options.reserve:
             self.reserve(options.reserve)
         elif options.release:
@@ -37,18 +39,24 @@ class Application(object):
 
     def display_list(self):
         """ Displays stuff list"""
-        for name, stat in self._conn.list_stuff().iteritems():
-            print("{0}: {1}".format(name, stat))
+        for stype, stuffs in self._conn.list_stuff().iteritems():
+            print('--- {0} ---'.format(stype))
+            for name, status in stuffs.iteritems():
+                print('{0}: {1}'.format(name, status))
 
-    def reserve(self, name):
-        """ Reserves stuff """
+    def reserve_stuff(self, name):
+        """ Reserves stuff with given name"""
         user = getpass.getuser()
-        Application.print_result(self._conn.reserve(name, user))
+        Application.print_result(self._conn.reserve_stuff(name, user))
+
+    def reserve(self, stype):
+        """ Reserves first available stuff with for given type"""
+        user = getpass.getuser()
+        print(self._conn.reserve(stype, user))
 
     def release(self, name):
         """ Releases stuff """
         Application.print_result(self._conn.release(name))
-
 
     @staticmethod
     def print_result(result):
@@ -71,6 +79,8 @@ def run(config):
     parser = argparse.ArgumentParser(description="Runs e2e test for SMC.")
     parser.add_argument('--list', action='store_true', help='list all stuff')
     parser.add_argument('--reserve', help='reserve stuff from selected type')
+    parser.add_argument('--reserve_stuff',
+                        help='reserve stuff with given name')
     parser.add_argument('--release', help='release stuff')
     parser.add_argument('--status', help='returns stuff status')
     parser.add_argument('--host',

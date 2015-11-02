@@ -7,31 +7,19 @@ import datetime
 
 class Reservation(object):
     """ Database reservation row wrapper"""
-    def __init__(self, row):
-        self._type = row[Database.TYPE]
-        self._name = row[Database.NAME]
-        self._user_name = row[Database.USER_NAME]
-        self._reservation_start = row[Database.RESERVATION_START_TIME]
 
-    @property
-    def type(self):
-        """ Stuff type """
-        return self._type
+    def __init__(self, stuff_type, stuff_name):
+        self.type = stuff_type
+        self.name = stuff_name
+        self.user_name = None
+        self.reservation_start = None
 
-    @property
-    def name(self):
-        """ Stuff name """
-        return self._name
-
-    @property
-    def user_name(self):
-        """ Reservation for user name """
-        return self._user_name
-
-    @property
-    def reservation_start(self):
-        """ Reservation start date """
-        return self._reservation_start
+    @staticmethod
+    def convert(row):
+        reservation = Reservation(row[Database.TYPE], row[Database.NAME])
+        reservation.user_name = row[Database.USER_NAME]
+        reservation.reservation_start = row[Database.RESERVATION_START_TIME]
+        return reservation
 
 
 class Database(object):
@@ -57,7 +45,7 @@ class Database(object):
         """ Returns all active reservations """
         with self._conn:
             return [
-                Reservation(row)
+                Reservation.convert(row)
                 for row in self._get_active_reservations(stuff_type,
                                                          stuff_name)
             ]

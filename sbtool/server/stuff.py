@@ -1,12 +1,12 @@
 r"""
 Stuff wrapper
 """
+from sbtool.server.gateways import Reservation
 
 
 class Stuff(object):
     """ Stuff wrapper """
 
-    OK = 'available'
     NOK = 'not available'
 
     def __init__(self, stype, name, gateway):
@@ -28,9 +28,8 @@ class Stuff(object):
         """ Returns stuff status """
         result = self.gateway.get_active_reservations(self.type, self.name)
         if result:
-            return "since {0}, user {1}".format(
-                result[0].reservation_start, result[0].user_name)
-        return Stuff.OK
+            return result[0]
+        return Reservation(self.type, self.name)
 
     def reserve(self, user):
         """ Reserves stuff for given user, returns true if success """

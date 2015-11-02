@@ -28,22 +28,35 @@ class TestApi(unittest.TestCase):
 
         self.uut = Api(stuffs)
 
+    def assertIsAvailable(self, result):
+        self.assertIsNone(result.user_name)
+        self.assertIsNone(result.reservation_start)
+
+    def assertIsReserved(self, name, result):
+        self.assertEqual(name, result.user_name)
+        self.assertIsNotNone(result.reservation_start)
+
     def test_when_list_stuff_called_then_all_stuff_returned(self):
         result = self.uut.list_stuff()
 
         self.assertEquals(len(STUFFS), len(result))
-        self.assertEquals(Stuff.OK, result[TYPE_1][STUFF_1])
-        self.assertEquals(Stuff.OK, result[TYPE_2][STUFF_2])
+        self.assertIsAvailable(result[TYPE_1][STUFF_1])
+        self.assertIsAvailable(result[TYPE_2][STUFF_2])
 
     def test_when_status_called_and_stuff_exists_then_return_status_ok(self):
-        self.assertEquals(Stuff.OK, self.uut.status(STUFF_1))
+        self.assertIsAvailable(self.uut.status(STUFF_1))
 
     def test_when_status_called_and_stuff_not_exists_then_return_nok(self):
         self.assertEquals(Stuff.NOK, self.uut.status(STUFF_3))
 
     def test_when_stuff_reserved_then_return_status_nok(self):
         self.assertTrue(self.uut.reserve_stuff(STUFF_1, USER))
-        self.assertIn('user user', self.uut.status(STUFF_1))
+
+        result = self.uut.status(STUFF_1)
+        self.assertEqual(result.type, TYPE_1)
+        self.assertEqual(result.name, STUFF_1)
+        self.assertEqual(result.user_name, USER)
+        self.assertIsNotNone(result.reservation_start)
 
     def test_should_return_false_when_reserve_called_more_than_once(self):
         self.assertTrue(self.uut.reserve_stuff(STUFF_1, USER))
@@ -64,9 +77,8 @@ class TestApi(unittest.TestCase):
 
         result = self.uut.list_stuff()
         self.assertEquals(len(STUFFS), len(result))
-        self.assertNotEquals(Stuff.OK, result[TYPE_1][STUFF_1])
-        self.assertNotEquals(Stuff.NOK, result[TYPE_1][STUFF_1])
-        self.assertEquals(Stuff.OK, result[TYPE_2][STUFF_2])
+        self.assertIsReserved(USER, result[TYPE_1][STUFF_1])
+        self.assertIsAvailable(result[TYPE_2][STUFF_2])
 
     def test_when_no_available_stuff_with_given_type_then_return_false(self):
         self.assertFalse(self.uut.reserve(TYPE_3, USER))

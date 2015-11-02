@@ -35,7 +35,7 @@ class Api(object):
         """ Reserves stuff with given name for given user """
         free_stuff = [stuff for stuff in self.stuffs
                       if stuff.name == name
-                      and stuff.status() == Stuff.OK]
+                      and stuff.status().is_available()]
         if free_stuff:
             return free_stuff[0].reserve(user)
         return False
@@ -43,7 +43,7 @@ class Api(object):
     def reserve(self, stuff_type, user):
         """ Reserve first available stuff for given type"""
         stuffs = [stuff for stuff in self.stuffs
-                  if stuff.type == stuff_type and stuff.status() == Stuff.OK]
+                  if stuff.type == stuff_type and stuff.status().is_available()]
         if stuffs and stuffs[0].reserve(user):
             return stuffs[0].name
         return False
@@ -51,8 +51,7 @@ class Api(object):
     def release(self, name):
         """ Releases stuff with given name"""
         stuff = [stuff for stuff in self.stuffs if stuff.name == name
-                 and stuff.status() != Stuff.OK
-                 and stuff.status() != Stuff.NOK]
+                 and stuff.status().is_available() is False]
 
         if stuff:
             return stuff[0].release()

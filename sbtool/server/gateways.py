@@ -14,6 +14,9 @@ class Reservation(object):
         self.user_name = None
         self.reservation_start = None
 
+    def is_available(self):
+        return self.user_name is None and self.reservation_start is None
+
     @staticmethod
     def convert(row):
         reservation = Reservation(row[Database.TYPE], row[Database.NAME])
